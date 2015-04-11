@@ -1,0 +1,25 @@
+{
+  "name": "scale.js",
+  "version": "1.0.0",
+  "description": "High-quality scale function for canvas and image element",
+  "main": "src/scale.js",
+  "scripts": {
+    "build_alpha": "uglifyjs src/scale.js -d HAS_ALPHA=true -m -c -o dist/scale.min.js",
+    "build_nonalpha": "uglifyjs src/scale.js -d HAS_ALPHA=false -m -c -o dist/scale-nonalpha.min.js",
+    "build": "npm run build_alpha & npm run build_nonalpha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sapics/scale.js.git"
+  },
+  "keywords": [
+    "scale",
+    "canvas"
+  ],
+  "author": "sapics",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sapics/scale.js/issues"
+  },
+  "homepage": "https://github.com/sapics/scale.js"
+}
