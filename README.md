@@ -21,5 +21,4 @@ Please use dist/scale.min.js, src/scale.js dose not work.
     </body></html>
 
 ## Licence
----
 MIT Licence
