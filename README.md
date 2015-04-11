@@ -11,8 +11,11 @@ Please use dist/scale.min.js, src/scale.js dose not work.
       <img id="image3" src="..." />
       <script src="dist/scale.min.js" />
       <script>
+      (function(){
+        // scale function return CanvasElement
         var newCanvas1 = scale(document.getElementById("canvas1"), 0.7, true);
         var newCanvas2 = scale(document.getElementById("image2"), {scaleX:1.7,scaleY:1.4}, true);
-        var newCanvas2 = scale(document.getElementById("image3"), {width:100,height:200}, true);
+        var newCanvas3 = scale(document.getElementById("image3"), {width:100,height:200}, true);
+      })();
       </script>
     </body></html>
