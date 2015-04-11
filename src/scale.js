@@ -340,8 +340,8 @@
 	}
 
 	// exports
-	if(exports){
-		if(module && module.exports){
+	if (typeof exports !== 'undefined') {
+		if (typeof module !== 'undefined' && module.exports) {
 			exports = module.exports = scale
 		}
 		exports.scale = scale
