@@ -1,12 +1,12 @@
-/**
- * Downscale canvas or image element
- * @param {CanvasElement|ImageElement} canvasOrImage
- * @param {Number|Object} scale
- * @param {CanvasElement} opt_destinationCanvas
- *                         if undefined, original canvas is rewritten
- * @return {CanvasElement}
- */
 (function() {
+	/**
+	 * High-quality scale function for canvas or image element
+	 * @param {CanvasElement|ImageElement} canvasOrImage
+	 * @param {Number|Object} scale
+	 * @param {CanvasElement} opt_destinationCanvas
+	 *                        if undefined, original canvas is rewritten
+	 * @return {CanvasElement}
+	 */
 	function scale (canvasOrImage, scale, opt_destinationCanvas) {
 		var canvas
 		if (canvasOrImage.src) {
@@ -49,7 +49,6 @@
 			, dwh4 = dw4 * dh
 			, tmpBuffer
 			, r, g, b, a
-			,	isx4
 			,	dsy, dsx
 			, newCanvas, imageData, byteBuffer
 			,	TIMES = 255.99 / 255
@@ -114,13 +113,13 @@
 					sx = dx / scaleX
 					isx = sx | 0
 					dsx = sx - isx
-					col1 = isx4 = isx << 2
-					col0 = isx < 1 ? col1 : isx4 - 4
+					col1 = isx << 2
+					col0 = isx < 1 ? col1 : col1 - 4
 					if (isx < sw - 2) {
-						col2 = isx4 + 4
-						col3 = isx4 + 8
+						col2 = col1 + 4
+						col3 = col1 + 8
 					} else {
-						col2 = isx > sw - 2 ? col1 : isx4 + 4
+						col2 = isx > sw - 2 ? col1 : col1 + 4
 						col3 = col2
 					}
 
