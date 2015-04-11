@@ -19,3 +19,6 @@ Please use dist/scale.min.js, src/scale.js dose not work.
       })();
       </script>
     </body></html>
+
+## Licence
+MIT Licence
