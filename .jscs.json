@@ -30,8 +30,6 @@
     "validateLineBreaks": "LF",
     "validateQuoteMarks": "'",
 
-    "safeContextKeyword": "_this",
-
     "validateJSDoc": {
       "checkParamNames": true,
       "requireParamTypes": true

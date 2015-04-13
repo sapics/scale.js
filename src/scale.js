@@ -1,27 +1,45 @@
 (function() {
+	var root = this
+
 	/**
 	 * High-quality scale function for canvas or image element
-	 * @param {CanvasElement|ImageElement} canvasOrImage
 	 * @param {Number|Object} scale
-	 * @param {CanvasElement} opt_destinationCanvas
-	 *                        if undefined, original canvas is rewritten
-	 * @return {CanvasElement}
+	 * @param {Canvas|Image} input
+	 * @param {Canvas|String} output
+	 *   if Canvas or undefined, export by canvas
+	 *   if export == 'png', export by Image png
+	 *   if export == 'jpeg', export by Image jpeg
+	 *   if export == 'png-src', export by base64 png string
+	 *   if export == 'jpeg-src', export by base64 jpeg string
+	 * @param {Boolean} inputRemovable
+	 *   if not true, original canvas is kept
+	 *   if true, original canvas is not kept
+	 * @return {Canvas|String|Image|Boolean}
+	 *   if error, return false
 	 */
-	function scale (canvasOrImage, scale, opt_destinationCanvas) {
+	function scale (scale, input, output, inputRemovable) {
+		if (!input){
+			input = scale.input
+			output = scale.output
+			inputRemovable = scale.inputRemovable
+			if (scale.scale) scale = scale.scale
+		}
+
 		var canvas
-		if (canvasOrImage.src) {
+		if (input.src) {
 			canvas = document.createElement('canvas')
-			canvas.width = canvasOrImage.naturalWidth
-			canvas.height = canvasOrImage.naturalHeight
-			canvas.getContext('2d').drawImage(canvasOrImage, 0, 0)
+			canvas.width = input.naturalWidth
+			canvas.height = input.naturalHeight
+			canvas.getContext('2d').drawImage(input, 0, 0)
 		} else {
-			canvas = canvasOrImage
+			canvas = input
 		}
 		var sw = canvas.width, sh = canvas.height
 			, dw, dh
-			, scaleX, scaleY, scaleXY
 			, sourceBuffer = canvas.getContext('2d').getImageData(0, 0, sw, sh).data
-		if (canvasOrImage.src || !opt_destinationCanvas) {
+
+		if (!sw || !sh ) return false
+		if (input.src || inputRemovable) {
 			canvas.clearRect(0, 0, sw, sh)
 		}
 		if (typeof scale === 'object') {
@@ -36,9 +54,6 @@
 			dw = scale * sw + 0.5 | 0
 			dh = scale * sh + 0.5 | 0
 		}
-		scaleX = dw / sw
-		scaleY = dh / sh
-		scaleXY = scaleX * scaleY
 		var dw4 = dw << 2
 			,	sw4 = sw << 2
 			, sx, sy, sindex = 0
@@ -54,13 +69,17 @@
 			,	TIMES = 255.99 / 255
 			, row0, row1, row2, row3
 			, col0, col1, col2, col3
+			, ctx
+			,	scaleX = dw / sw
+			,	scaleY = dh / sh
+			,	scaleXY = scaleX * scaleY
 
 		function getNewCanvas() {
 			// CREATE downscale canvas
 			var newCanvas
-			if (typeof opt_destinationCanvas === 'object') {
-				newCanvas = opt_destinationCanvas
-			} else if (!opt_destinationCanvas || canvasOrImage.src) {
+			if (typeof output === 'object') {
+				newCanvas = output
+			} else if (input.src || inputRemovable) {
 				newCanvas = canvas
 			} else {
 				newCanvas = document.createElement('canvas')
@@ -69,9 +88,9 @@
 			newCanvas.height = dh
 			return newCanvas
 		}
-		function getImageData(canvas, tmpBuffer) {
+		function getImageData(tmpBuffer) {
 			if (!tmpBuffer) {
-				return canvas.getContext('2d').getImageData(0, 0, dw, dh)
+				return newCanvas.getContext('2d').getImageData(0, 0, dw, dh)
 			} else {
 				var imageData = newCanvas.getContext('2d').getImageData(0, 0, dw, dh)
 					, byteBuffer = imageData.data
@@ -93,7 +112,7 @@
 				return 0.5 * (c - a + (2 * a - 5 * b + 4 * c - d + (3 * (b - c) + d - a) * t) * t) * t + b
 			}
 			newCanvas = getNewCanvas()
-			imageData = getImageData(newCanvas)
+			imageData = getImageData()
 			byteBuffer = imageData.data
 			for (dy = 0; dy < dh; dy++) {
 				sy = dy / scaleY
@@ -241,7 +260,7 @@
 			}
 		} else {
 			// DOWNSCALE
-			if (window.Float32Array) {
+			if (root.Float32Array) {
 				tmpBuffer = new Float32Array(dwh4)
 			} else {
 				tmpBuffer = []
@@ -332,11 +351,28 @@
 			}
 			delete sourceBuffer
 			newCanvas = getNewCanvas()
-			imageData = getImageData(newCanvas, tmpBuffer)
+			imageData = getImageData(tmpBuffer)
 		}
+
 		newCanvas.getContext('2d').putImageData(imageData, 0, 0)
+		if (typeof output === 'string') {
+			if (output === 'png' || output === 'jpeg') {
+				var img
+				if (inputRemovable && input.src) {
+					img = input
+				} else {
+					img = new Image()
+				}
+				img.width = dw
+				img.height = dh
+				img.src = newCanvas.toDataURL('image/' + output, 1)
+				return img
+			} else if (output === 'png-src' || output === 'jpeg-src') {
+				return newCanvas.toDataURL('image/' + output.split('-')[0], 1)
+			}
+		}
 		return newCanvas
-	}
+	}// scale function end
 
 	// exports
 	if (typeof exports !== 'undefined') {
@@ -345,6 +381,6 @@
 		}
 		exports.scale = scale
 	} else {
-		this.scale = scale
+		root.scale = scale
 	}
 }.call(this))

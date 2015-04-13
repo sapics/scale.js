@@ -6,16 +6,27 @@ If scale factor < 1, then algorithm for downscale is used, other than that, bicu
 Please use dist/scale.min.js, src/scale.js dose not work.
 
     <html><body>
-      <canvas id="canvas1"></canvas>
-      <img id="image2" src="..." />
-      <img id="image3" src="..." />
+      <canvas id="inputCanvas"></canvas>
+      <img id="inputImage" src="..." />
+      <canvas id="exportCanvas"></canvas>
+      
       <script src="dist/scale.min.js" />
       <script>
       (function(){
+        var inputCanvas = document.getElementById("inputCanvas");
+        var inputImage = document.getElementById("inputImage");
         // scale function return CanvasElement
-        var newCanvas1 = scale(document.getElementById("canvas1"), 0.7, true);
-        var newCanvas2 = scale(document.getElementById("image2"), {scaleX:1.7,scaleY:1.4}, true);
-        var newCanvas3 = scale(document.getElementById("image3"), {width:100,height:200}, true);
+        var newCanvas1 = scale(inputCanvas,
+                               0.7);
+        var newCanvas2 = scale(inputImage,
+                               {scaleX:1.7, scaleY:1.4},
+                               document.getElementById("exportCanvas2"));
+        var jpegImage  = scale(inputCanvas,
+                               {width:100, height:200},
+                               'jpeg');
+        var pngSrc     = scale(inputCanvas,
+                               0.7,
+                               'png-src');
       })();
       </script>
     </body></html>
