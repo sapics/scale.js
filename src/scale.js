@@ -18,25 +18,24 @@
 	 *   if error, return false
 	 */
 	function scale (scale, input, output, inputRemovable) {
-		if (!input){
+		if (!input) {
 			input = scale.input
 			output = scale.output
 			inputRemovable = scale.inputRemovable
 			if (scale.scale) scale = scale.scale
 		}
 
-		var canvas
+		var canvas, ctx
 		if (input.src) {
 			canvas = document.createElement('canvas')
 			canvas.width = input.naturalWidth
 			canvas.height = input.naturalHeight
-			canvas.getContext('2d').drawImage(input, 0, 0)
-		} else {
-			canvas = input
 		}
+		ctx = canvas.getContext('2d')
+		if (input.src) ctx.drawImage(input, 0, 0)
 		var sw = canvas.width, sh = canvas.height
 			, dw, dh
-			, sourceBuffer = canvas.getContext('2d').getImageData(0, 0, sw, sh).data
+			, sourceBuffer = ctx.getImageData(0, 0, sw, sh).data
 
 		if (!sw || !sh ) return false
 		if (input.src || inputRemovable) {
@@ -69,7 +68,6 @@
 			,	TIMES = 255.99 / 255
 			, row0, row1, row2, row3
 			, col0, col1, col2, col3
-			, ctx
 			,	scaleX = dw / sw
 			,	scaleY = dh / sh
 			,	scaleXY = scaleX * scaleY
@@ -124,8 +122,7 @@
 					row2 = row1 + sw4
 					row3 = (isy + 2) * sw4
 				} else {
-					row2 = isy > sh - 2 ? row1 : row1 + sw4
-					row3 = row2
+					row2 = row3 = isy > sh - 2 ? row1 : row1 + sw4
 				}
 
 				for (dx = 0; dx < dw; dx++, dindex += 4) {
@@ -138,10 +135,10 @@
 						col2 = col1 + 4
 						col3 = col1 + 8
 					} else {
-						col2 = isx > sw - 2 ? col1 : col1 + 4
-						col3 = col2
+						col2 = col3 = isx > sw - 2 ? col1 : col1 + 4
 					}
 
+					// RED
 					r = bicubic(dsy,
 								bicubic(dsx
 								,	sourceBuffer[row0 + col0]
@@ -168,56 +165,62 @@
 								,	sourceBuffer[row3 + col3]
 								)
 							) * TIMES | 0
+
+					// GREEN
+					++col0, ++col1, ++col2, ++col3
 					g = bicubic(dsy,
 								bicubic(dsx
-								,	sourceBuffer[row0 + col0 + 1]
-								,	sourceBuffer[row0 + col1 + 1]
-								,	sourceBuffer[row0 + col2 + 1]
-								,	sourceBuffer[row0 + col3 + 1]
+								,	sourceBuffer[row0 + col0]
+								,	sourceBuffer[row0 + col1]
+								,	sourceBuffer[row0 + col2]
+								,	sourceBuffer[row0 + col3]
 								)
 							,	bicubic(dsx
-								,	sourceBuffer[row1 + col0 + 1]
-								,	sourceBuffer[row1 + col1 + 1]
-								,	sourceBuffer[row1 + col2 + 1]
-								,	sourceBuffer[row1 + col3 + 1]
+								,	sourceBuffer[row1 + col0]
+								,	sourceBuffer[row1 + col1]
+								,	sourceBuffer[row1 + col2]
+								,	sourceBuffer[row1 + col3]
 								)
 							,	bicubic(dsx
-								,	sourceBuffer[row2 + col0 + 1]
-								,	sourceBuffer[row2 + col1 + 1]
-								,	sourceBuffer[row2 + col2 + 1]
-								,	sourceBuffer[row2 + col3 + 1]
+								,	sourceBuffer[row2 + col0]
+								,	sourceBuffer[row2 + col1]
+								,	sourceBuffer[row2 + col2]
+								,	sourceBuffer[row2 + col3]
 								)
 							,	bicubic(dsx
-								,	sourceBuffer[row3 + col0 + 1]
-								,	sourceBuffer[row3 + col1 + 1]
-								,	sourceBuffer[row3 + col2 + 1]
-								,	sourceBuffer[row3 + col3 + 1]
+								,	sourceBuffer[row3 + col0]
+								,	sourceBuffer[row3 + col1]
+								,	sourceBuffer[row3 + col2]
+								,	sourceBuffer[row3 + col3]
 								)
 							) * TIMES | 0
+
+					// BLUE
+					++col0, ++col1, ++col2, ++col3
 					b = bicubic(dsy,
 								bicubic(dsx
-								,	sourceBuffer[row0 + col0 + 2]
-								,	sourceBuffer[row0 + col1 + 2]
-								,	sourceBuffer[row0 + col2 + 2]
-								,	sourceBuffer[row0 + col3 + 2]
+								,	sourceBuffer[row0 + col0]
+								,	sourceBuffer[row0 + col1]
+								,	sourceBuffer[row0 + col2]
+								,	sourceBuffer[row0 + col3]
 								)
 							,	bicubic(dsx
-								,	sourceBuffer[row1 + col0 + 2]
-								,	sourceBuffer[row1 + col1 + 2]
-								,	sourceBuffer[row1 + col2 + 2]
-								,	sourceBuffer[row1 + col3 + 2]
+								,	sourceBuffer[row1 + col0]
+								,	sourceBuffer[row1 + col1]
+								,	sourceBuffer[row1 + col2]
+								,	sourceBuffer[row1 + col3]
 								)
 							,	bicubic(dsx
-								,	sourceBuffer[row2 + col0 + 2]
-								,	sourceBuffer[row2 + col1 + 2]
-								,	sourceBuffer[row2 + col2 + 2]
-								,	sourceBuffer[row2 + col3 + 2]
+								,	sourceBuffer[row2 + col0]
+								,	sourceBuffer[row2 + col1]
+								,	sourceBuffer[row2 + col2]
+								,	sourceBuffer[row2 + col3]
 								)
 							,	bicubic(dsx
-								,	sourceBuffer[row3 + col0 + 2]
-								,	sourceBuffer[row3 + col1 + 2]
-								,	sourceBuffer[row3 + col2 + 2]
-								,	sourceBuffer[row3 + col3 + 2]
+								,	sourceBuffer[row3 + col0]
+								,	sourceBuffer[row3 + col1]
+								,	sourceBuffer[row3 + col2]
+								,	sourceBuffer[row3 + col3]
 								)
 							) * TIMES | 0
 
@@ -226,30 +229,32 @@
 					byteBuffer[dindex + 2] = b >= 0 ? b < 256 ? b : 255 : 0
 
 					if (HAS_ALPHA) {
+						// ALPHA
+						++col0, ++col1, ++col2, ++col3
 						a = bicubic(dsy,
 								bicubic(dsx
-								,	sourceBuffer[row0 + col0 + 3]
-								,	sourceBuffer[row0 + col1 + 3]
-								,	sourceBuffer[row0 + col2 + 3]
-								,	sourceBuffer[row0 + col3 + 3]
+								,	sourceBuffer[row0 + col0]
+								,	sourceBuffer[row0 + col1]
+								,	sourceBuffer[row0 + col2]
+								,	sourceBuffer[row0 + col3]
 								)
 							,	bicubic(dsx
-								,	sourceBuffer[row1 + col0 + 3]
-								,	sourceBuffer[row1 + col1 + 3]
-								,	sourceBuffer[row1 + col2 + 3]
-								,	sourceBuffer[row1 + col3 + 3]
+								,	sourceBuffer[row1 + col0]
+								,	sourceBuffer[row1 + col1]
+								,	sourceBuffer[row1 + col2]
+								,	sourceBuffer[row1 + col3]
 								)
 							,	bicubic(dsx
-								,	sourceBuffer[row2 + col0 + 3]
-								,	sourceBuffer[row2 + col1 + 3]
-								,	sourceBuffer[row2 + col2 + 3]
-								,	sourceBuffer[row2 + col3 + 3]
+								,	sourceBuffer[row2 + col0]
+								,	sourceBuffer[row2 + col1]
+								,	sourceBuffer[row2 + col2]
+								,	sourceBuffer[row2 + col3]
 								)
 							,	bicubic(dsx
-								,	sourceBuffer[row3 + col0 + 3]
-								,	sourceBuffer[row3 + col1 + 3]
-								,	sourceBuffer[row3 + col2 + 3]
-								,	sourceBuffer[row3 + col3 + 3]
+								,	sourceBuffer[row3 + col0]
+								,	sourceBuffer[row3 + col1]
+								,	sourceBuffer[row3 + col2]
+								,	sourceBuffer[row3 + col3]
 								)
 							) * TIMES | 0
 						byteBuffer[dindex + 3] = a >= 0 ? a < 256 ? a : 255 : 0

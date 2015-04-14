@@ -2,7 +2,7 @@
   "name": "scale.js",
   "version": "1.0.0",
   "description": "High-quality scale function for canvas and image element",
-  "main": "src/scale.js",
+  "main": "dist/scale.min.js",
   "scripts": {
     "build_alpha": "uglifyjs src/scale.js -d HAS_ALPHA=true -m -c -o dist/scale.min.js",
     "build_nonalpha": "uglifyjs src/scale.js -d HAS_ALPHA=false -m -c -o dist/scale-nonalpha.min.js",
