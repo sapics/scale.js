@@ -5,13 +5,13 @@
 	 * High-quality scale function for canvas or image element
 	 * @param {Number|Object} scale
 	 * @param {Canvas|Image} input
-	 * @param {Canvas|String} output
+	 * @param {Canvas|String} [output]
 	 *   if Canvas or undefined, export by canvas
 	 *   if export == 'png', export by Image png
 	 *   if export == 'jpeg', export by Image jpeg
 	 *   if export == 'png-src', export by base64 png string
 	 *   if export == 'jpeg-src', export by base64 jpeg string
-	 * @param {Boolean} inputRemovable
+	 * @param {Boolean} [inputRemovable]
 	 *   if not true, original canvas is kept
 	 *   if true, original canvas is not kept
 	 * @return {Canvas|String|Image|Boolean}
@@ -54,7 +54,7 @@
 			dh = scale * sh + 0.5 | 0
 		}
 		var dw4 = dw << 2
-			,	sw4 = sw << 2
+			, sw4 = sw << 2
 			, sx, sy, sindex = 0
 			, dx, dy, dyindex, dindex = 0
 			, idx, idy, isx, isy
@@ -63,18 +63,17 @@
 			, dwh4 = dw4 * dh
 			, tmpBuffer
 			, r, g, b, a
-			,	dsy, dsx
-			, newCanvas, imageData, byteBuffer
-			,	TIMES = 255.99 / 255
+			, dsy, dsx
+			, newCanvas, newCtx, imageData, byteBuffer
+			, TIMES = 255.99 / 255
 			, row0, row1, row2, row3
 			, col0, col1, col2, col3
-			,	scaleX = dw / sw
-			,	scaleY = dh / sh
-			,	scaleXY = scaleX * scaleY
+			, scaleX = dw / sw
+			, scaleY = dh / sh
+			, scaleXY = scaleX * scaleY
 
-		function getNewCanvas() {
+		function setNewCanvas() {
 			// CREATE downscale canvas
-			var newCanvas
 			if (typeof output === 'object') {
 				newCanvas = output
 			} else if (input.src || inputRemovable) {
@@ -84,15 +83,15 @@
 			}
 			newCanvas.width = dw
 			newCanvas.height = dh
-			return newCanvas
+			newCtx = newCanvas.getContext('2d')
 		}
 		function getImageData(tmpBuffer) {
 			if (!tmpBuffer) {
-				return newCanvas.getContext('2d').getImageData(0, 0, dw, dh)
+				return newCtx.getImageData(0, 0, dw, dh)
 			} else {
-				var imageData = newCanvas.getContext('2d').getImageData(0, 0, dw, dh)
+				var imageData = newCtx.getImageData(0, 0, dw, dh)
 					, byteBuffer = imageData.data
-					,	dindex
+					, dindex
 				for (dindex = 0; dindex < dwh4; dindex += 4) {
 					byteBuffer[dindex    ] = tmpBuffer[dindex    ] * TIMES | 0
 					byteBuffer[dindex + 1] = tmpBuffer[dindex + 1] * TIMES | 0
@@ -109,7 +108,7 @@
 			function bicubic (t, a, b, c, d) {
 				return 0.5 * (c - a + (2 * a - 5 * b + 4 * c - d + (3 * (b - c) + d - a) * t) * t) * t + b
 			}
-			newCanvas = getNewCanvas()
+			setNewCanvas()
 			imageData = getImageData()
 			byteBuffer = imageData.data
 			for (dy = 0; dy < dh; dy++) {
@@ -141,28 +140,28 @@
 					// RED
 					r = bicubic(dsy,
 								bicubic(dsx
-								,	sourceBuffer[row0 + col0]
-								,	sourceBuffer[row0 + col1]
-								,	sourceBuffer[row0 + col2]
-								,	sourceBuffer[row0 + col3]
+								, sourceBuffer[row0 + col0]
+								, sourceBuffer[row0 + col1]
+								, sourceBuffer[row0 + col2]
+								, sourceBuffer[row0 + col3]
 								)
-							,	bicubic(dsx
-								,	sourceBuffer[row1 + col0]
-								,	sourceBuffer[row1 + col1]
-								,	sourceBuffer[row1 + col2]
-								,	sourceBuffer[row1 + col3]
+							, bicubic(dsx
+								, sourceBuffer[row1 + col0]
+								, sourceBuffer[row1 + col1]
+								, sourceBuffer[row1 + col2]
+								, sourceBuffer[row1 + col3]
 								)
-							,	bicubic(dsx
-								,	sourceBuffer[row2 + col0]
-								,	sourceBuffer[row2 + col1]
-								,	sourceBuffer[row2 + col2]
-								,	sourceBuffer[row2 + col3]
+							, bicubic(dsx
+								, sourceBuffer[row2 + col0]
+								, sourceBuffer[row2 + col1]
+								, sourceBuffer[row2 + col2]
+								, sourceBuffer[row2 + col3]
 								)
-							,	bicubic(dsx
-								,	sourceBuffer[row3 + col0]
-								,	sourceBuffer[row3 + col1]
-								,	sourceBuffer[row3 + col2]
-								,	sourceBuffer[row3 + col3]
+							, bicubic(dsx
+								, sourceBuffer[row3 + col0]
+								, sourceBuffer[row3 + col1]
+								, sourceBuffer[row3 + col2]
+								, sourceBuffer[row3 + col3]
 								)
 							) * TIMES | 0
 
@@ -170,28 +169,28 @@
 					++col0, ++col1, ++col2, ++col3
 					g = bicubic(dsy,
 								bicubic(dsx
-								,	sourceBuffer[row0 + col0]
-								,	sourceBuffer[row0 + col1]
-								,	sourceBuffer[row0 + col2]
-								,	sourceBuffer[row0 + col3]
+								, sourceBuffer[row0 + col0]
+								, sourceBuffer[row0 + col1]
+								, sourceBuffer[row0 + col2]
+								, sourceBuffer[row0 + col3]
 								)
-							,	bicubic(dsx
-								,	sourceBuffer[row1 + col0]
-								,	sourceBuffer[row1 + col1]
-								,	sourceBuffer[row1 + col2]
-								,	sourceBuffer[row1 + col3]
+							, bicubic(dsx
+								, sourceBuffer[row1 + col0]
+								, sourceBuffer[row1 + col1]
+								, sourceBuffer[row1 + col2]
+								, sourceBuffer[row1 + col3]
 								)
-							,	bicubic(dsx
-								,	sourceBuffer[row2 + col0]
-								,	sourceBuffer[row2 + col1]
-								,	sourceBuffer[row2 + col2]
-								,	sourceBuffer[row2 + col3]
+							, bicubic(dsx
+								, sourceBuffer[row2 + col0]
+								, sourceBuffer[row2 + col1]
+								, sourceBuffer[row2 + col2]
+								, sourceBuffer[row2 + col3]
 								)
-							,	bicubic(dsx
-								,	sourceBuffer[row3 + col0]
-								,	sourceBuffer[row3 + col1]
-								,	sourceBuffer[row3 + col2]
-								,	sourceBuffer[row3 + col3]
+							, bicubic(dsx
+								, sourceBuffer[row3 + col0]
+								, sourceBuffer[row3 + col1]
+								, sourceBuffer[row3 + col2]
+								, sourceBuffer[row3 + col3]
 								)
 							) * TIMES | 0
 
@@ -199,28 +198,28 @@
 					++col0, ++col1, ++col2, ++col3
 					b = bicubic(dsy,
 								bicubic(dsx
-								,	sourceBuffer[row0 + col0]
-								,	sourceBuffer[row0 + col1]
-								,	sourceBuffer[row0 + col2]
-								,	sourceBuffer[row0 + col3]
+								, sourceBuffer[row0 + col0]
+								, sourceBuffer[row0 + col1]
+								, sourceBuffer[row0 + col2]
+								, sourceBuffer[row0 + col3]
 								)
-							,	bicubic(dsx
-								,	sourceBuffer[row1 + col0]
-								,	sourceBuffer[row1 + col1]
-								,	sourceBuffer[row1 + col2]
-								,	sourceBuffer[row1 + col3]
+							, bicubic(dsx
+								, sourceBuffer[row1 + col0]
+								, sourceBuffer[row1 + col1]
+								, sourceBuffer[row1 + col2]
+								, sourceBuffer[row1 + col3]
 								)
-							,	bicubic(dsx
-								,	sourceBuffer[row2 + col0]
-								,	sourceBuffer[row2 + col1]
-								,	sourceBuffer[row2 + col2]
-								,	sourceBuffer[row2 + col3]
+							, bicubic(dsx
+								, sourceBuffer[row2 + col0]
+								, sourceBuffer[row2 + col1]
+								, sourceBuffer[row2 + col2]
+								, sourceBuffer[row2 + col3]
 								)
-							,	bicubic(dsx
-								,	sourceBuffer[row3 + col0]
-								,	sourceBuffer[row3 + col1]
-								,	sourceBuffer[row3 + col2]
-								,	sourceBuffer[row3 + col3]
+							, bicubic(dsx
+								, sourceBuffer[row3 + col0]
+								, sourceBuffer[row3 + col1]
+								, sourceBuffer[row3 + col2]
+								, sourceBuffer[row3 + col3]
 								)
 							) * TIMES | 0
 
@@ -232,31 +231,31 @@
 						// ALPHA
 						++col0, ++col1, ++col2, ++col3
 						a = bicubic(dsy,
-								bicubic(dsx
-								,	sourceBuffer[row0 + col0]
-								,	sourceBuffer[row0 + col1]
-								,	sourceBuffer[row0 + col2]
-								,	sourceBuffer[row0 + col3]
-								)
-							,	bicubic(dsx
-								,	sourceBuffer[row1 + col0]
-								,	sourceBuffer[row1 + col1]
-								,	sourceBuffer[row1 + col2]
-								,	sourceBuffer[row1 + col3]
-								)
-							,	bicubic(dsx
-								,	sourceBuffer[row2 + col0]
-								,	sourceBuffer[row2 + col1]
-								,	sourceBuffer[row2 + col2]
-								,	sourceBuffer[row2 + col3]
-								)
-							,	bicubic(dsx
-								,	sourceBuffer[row3 + col0]
-								,	sourceBuffer[row3 + col1]
-								,	sourceBuffer[row3 + col2]
-								,	sourceBuffer[row3 + col3]
-								)
-							) * TIMES | 0
+									bicubic(dsx
+									, sourceBuffer[row0 + col0]
+									, sourceBuffer[row0 + col1]
+									, sourceBuffer[row0 + col2]
+									, sourceBuffer[row0 + col3]
+									)
+								, bicubic(dsx
+									, sourceBuffer[row1 + col0]
+									, sourceBuffer[row1 + col1]
+									, sourceBuffer[row1 + col2]
+									, sourceBuffer[row1 + col3]
+									)
+								, bicubic(dsx
+									, sourceBuffer[row2 + col0]
+									, sourceBuffer[row2 + col1]
+									, sourceBuffer[row2 + col2]
+									, sourceBuffer[row2 + col3]
+									)
+								, bicubic(dsx
+									, sourceBuffer[row3 + col0]
+									, sourceBuffer[row3 + col1]
+									, sourceBuffer[row3 + col2]
+									, sourceBuffer[row3 + col3]
+									)
+								) * TIMES | 0
 						byteBuffer[dindex + 3] = a >= 0 ? a < 256 ? a : 255 : 0
 					} else {
 						byteBuffer[dindex + 3] = 255
@@ -269,8 +268,8 @@
 				tmpBuffer = new Float32Array(dwh4)
 			} else {
 				tmpBuffer = []
-				for (var i = 0; i < dwh4; ++i) {
-					tmpBuffer[i] = 0
+				for (dindex = 0; dindex < dwh4; ++dindex) {
+					tmpBuffer[dindex] = 0
 				}
 			}
 			// CREATE float buffer
@@ -355,11 +354,11 @@
 				}
 			}
 			delete sourceBuffer
-			newCanvas = getNewCanvas()
+			setNewCanvas()
 			imageData = getImageData(tmpBuffer)
 		}
 
-		newCanvas.getContext('2d').putImageData(imageData, 0, 0)
+		newCtx.putImageData(imageData, 0, 0)
 		if (typeof output === 'string') {
 			if (output === 'png' || output === 'jpeg') {
 				var img
