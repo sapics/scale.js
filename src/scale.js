@@ -28,8 +28,29 @@
 		var canvas, ctx
 		if (input.src) {
 			canvas = document.createElement('canvas')
-			canvas.width = input.naturalWidth
-			canvas.height = input.naturalHeight
+			if (input.naturalWidth != null) {
+				canvas.width = input.naturalWidth
+				canvas.height = input.naturalHeight
+			} else if (input.runtimeStyle != null) {
+				var runtimeStyle = input.runtimeStyle
+				  , mw = runtimeStyle.width, mh = runtimeStyle.height
+				runtimeStyle.width = 'auto'
+				runtimeStyle.height = 'auto'
+				canvas.width = input.width
+				canvas.height = input.height
+				runtimeStyle.width = mw
+				runtimeStyle.height = mh
+			} else {
+				var mw = input.width, mh = input.height
+				if (input.removeAttribute) {
+					input.removeAttribute('width')
+					input.removeAttribute('height')
+				}
+				canvas.width = input.width
+				canvas.height = input.height
+				input.width = mw
+				input.height = mh
+			}
 		} else {
 			canvas = input
 		}
