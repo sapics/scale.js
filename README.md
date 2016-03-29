@@ -3,7 +3,7 @@ High-quality scale function for canvas and image element.
 If scale factor < 1, then algorithm for downscale is used, other than that, bicubic algorithm is used.
 
 ## How to use
-Please use dist/scale.min.js, src/scale.js dose not work.
+Please use dist/scale.min.js, because src/scale.js dose not work.
 
     <html><body>
       <canvas id="inputCanvas"></canvas>
