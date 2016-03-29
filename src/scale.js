@@ -30,6 +30,8 @@
 			canvas = document.createElement('canvas')
 			canvas.width = input.naturalWidth
 			canvas.height = input.naturalHeight
+		} else {
+			canvas = input
 		}
 		ctx = canvas.getContext('2d')
 		if (input.src) ctx.drawImage(input, 0, 0)
