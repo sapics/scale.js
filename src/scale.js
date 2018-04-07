@@ -62,7 +62,7 @@
 
 		if (!sw || !sh ) return false
 		if (input.src || inputRemovable) {
-			canvas.clearRect(0, 0, sw, sh)
+			ctx.clearRect(0, 0, sw, sh)
 		}
 		if (typeof scale === 'object') {
 			if (scale.width) {
